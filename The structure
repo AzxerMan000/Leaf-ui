@@ -8,7 +8,7 @@ local UI = {}
 
 -- Config
 local enableKeySystem = false
-local correctKey = "OpenSesame" -- default password
+local correctKey = "OpenSesame"
 local unlockFlagName = "UnnamedLibraryUnlocked"
 
 -- Theme colors
@@ -120,8 +120,8 @@ local function createUI(title)
     gui.ResetOnSpawn = false
 
     local main = Instance.new("Frame", gui)
-    main.Size = UDim2.new(0, 500, 0, 350)
-    main.Position = UDim2.new(0.5, -250, 0.5, -175)
+    main.Size = UDim2.new(0, 600, 0, 400)
+    main.Position = UDim2.new(0.5, -300, 0.5, -200)
     main.BackgroundColor3 = Theme.Background
     roundify(main)
     makeDraggable(main)
@@ -164,36 +164,28 @@ local function createUI(title)
     minimizeButton.TextColor3 = Color3.new(0, 0, 0)
     roundify(minimizeButton)
 
-    local content = Instance.new("Frame", main)
-    content.Size = UDim2.new(1, -70, 1, -50) -- leave space for vertical tab bar
-    content.Position = UDim2.new(0, 60, 0, 40) -- moved right to give space for tabs
-    content.BackgroundTransparency = 1
-
     local tabBar = Instance.new("Frame", main)
-    tabBar.Size = UDim2.new(0, 50, 1, -50) -- vertical bar on left side
-    tabBar.Position = UDim2.new(0, 10, 0, 40)
+    tabBar.Size = UDim2.new(0, 120, 1, -30)
+    tabBar.Position = UDim2.new(0, 0, 0, 30)
     tabBar.BackgroundTransparency = 1
 
     local tabLayout = Instance.new("UIListLayout", tabBar)
     tabLayout.FillDirection = Enum.FillDirection.Vertical
     tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    tabLayout.Padding = UDim.new(0, 6)
+    tabLayout.Padding = UDim.new(0, 4)
+
+    local content = Instance.new("Frame", main)
+    content.Size = UDim2.new(1, -130, 1, -40)
+    content.Position = UDim2.new(0, 130, 0, 35)
+    content.BackgroundTransparency = 1
 
     local minimized = false
     minimizeButton.MouseButton1Click:Connect(function()
-        if minimized then
-            main.Size = UDim2.new(0, 500, 0, 350)
-            content.Visible = true
-            tabBar.Visible = true
-            minimized = false
-            minimizeButton.Text = "-"
-        else
-            main.Size = UDim2.new(0, 500, 0, 30)
-            content.Visible = false
-            tabBar.Visible = false
-            minimized = true
-            minimizeButton.Text = "+"
-        end
+        minimized = not minimized
+        main.Size = minimized and UDim2.new(0, 600, 0, 30) or UDim2.new(0, 600, 0, 400)
+        content.Visible = not minimized
+        tabBar.Visible = not minimized
+        minimizeButton.Text = minimized and "+" or "-"
     end)
 
     local tabs = {}
@@ -205,122 +197,4 @@ local function createUI(title)
         tabFrame.Visible = false
 
         local sectionLayout = Instance.new("UIListLayout", tabFrame)
-        sectionLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        sectionLayout.Padding = UDim.new(0, 10)
-
-        local tabButton = Instance.new("TextButton", tabBar)
-        tabButton.Size = UDim2.new(1, 0, 0, 40)
-        tabButton.BackgroundColor3 = Theme.Section
-        tabButton.TextColor3 = Theme.Text
-        tabButton.Font = Enum.Font.Gotham
-        tabButton.TextSize = 14
-        tabButton.Text = name
-        roundify(tabButton)
-
-        tabButton.MouseButton1Click:Connect(function()
-            for _, tab in pairs(tabs) do
-                tab.Frame.Visible = false
-            end
-            tabFrame.Visible = true
-        end)
-
-        local function createSection(title)
-            local sec = Instance.new("Frame", tabFrame)
-            sec.Size = UDim2.new(1, 0, 0, 100)
-            sec.BackgroundColor3 = Theme.Section
-            roundify(sec)
-
-            local secLayout = Instance.new("UIListLayout", sec)
-            secLayout.SortOrder = Enum.SortOrder.LayoutOrder
-            secLayout.Padding = UDim.new(0, 5)
-
-            local label = Instance.new("TextLabel", sec)
-            label.Size = UDim2.new(1, -10, 0, 20)
-            label.Position = UDim2.new(0, 5, 0, 5)
-            label.BackgroundTransparency = 1
-            label.TextColor3 = Theme.Text
-            label.Font = Enum.Font.GothamBold
-            label.TextSize = 14
-            label.TextXAlignment = Enum.TextXAlignment.Left
-            label.Text = title
-
-            local buttonHolder = Instance.new("Frame", sec)
-            buttonHolder.Size = UDim2.new(1, -10, 1, -30)
-            buttonHolder.Position = UDim2.new(0, 5, 0, 30)
-            buttonHolder.BackgroundTransparency = 1
-
-            local buttonLayout = Instance.new("UIListLayout", buttonHolder)
-            buttonLayout.SortOrder = Enum.SortOrder.LayoutOrder
-            buttonLayout.Padding = UDim.new(0, 5)
-
-            local function createButton(text, callback)
-                local btn = Instance.new("TextButton", buttonHolder)
-                btn.Size = UDim2.new(1, 0, 0, 30)
-                btn.BackgroundColor3 = Theme.Button
-                btn.TextColor3 = Theme.Text
-                btn.Font = Enum.Font.Gotham
-                btn.TextSize = 14
-                btn.Text = text
-                roundify(btn)
-
-                btn.MouseButton1Click:Connect(function()
-                    if callback then
-                        callback()
-                    end
-                end)
-            end
-
-            return {
-                CreateButton = createButton
-            }
-        end
-
-        local tabData = {
-            Frame = tabFrame,
-            CreateSection = createSection
-        }
-
-        table.insert(tabs, tabData)
-
-        if #tabs == 1 then
-            tabFrame.Visible = true
-        end
-
-        return tabData
-    end
-
-    return {
-        CreateTab = createTab
-    }
-end
-
--- API functions
-function UI.SetKeySystemEnabled(enabled)
-    enableKeySystem = enabled and true or false
-end
-
-function UI.SetKey(key)
-    correctKey = tostring(key or "")
-end
-
-function UI.Create(title, callback)
-    local unlocked = PlayerGui:FindFirstChild(unlockFlagName)
-
-    if enableKeySystem and not unlocked then
-        promptKeyInput(function()
-            local ui = createUI(title)
-            if callback then
-                callback(ui)
-            end
-        end)
-    else
-        local ui = createUI(title)
-        if callback then
-            callback(ui)
-        else
-            return ui
-        end
-    end
-end
-
-return UI
+        sectionLayout.SortOrder = Enum
