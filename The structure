@@ -8,7 +8,7 @@ local UI = {}
 
 -- Config
 local enableKeySystem = false
-local correctKey = "OpenSesame"
+local correctKey = "OpenSesame" -- default password
 local unlockFlagName = "UnnamedLibraryUnlocked"
 
 -- Theme colors
@@ -165,17 +165,17 @@ local function createUI(title)
     roundify(minimizeButton)
 
     local content = Instance.new("Frame", main)
-    content.Size = UDim2.new(1, -20, 1, -50)
-    content.Position = UDim2.new(0, 10, 0, 40)
+    content.Size = UDim2.new(1, -70, 1, -50) -- leave space for vertical tab bar
+    content.Position = UDim2.new(0, 60, 0, 40) -- moved right to give space for tabs
     content.BackgroundTransparency = 1
 
     local tabBar = Instance.new("Frame", main)
-    tabBar.Size = UDim2.new(1, -20, 0, 30)
-    tabBar.Position = UDim2.new(0, 10, 0, 5)
+    tabBar.Size = UDim2.new(0, 50, 1, -50) -- vertical bar on left side
+    tabBar.Position = UDim2.new(0, 10, 0, 40)
     tabBar.BackgroundTransparency = 1
 
     local tabLayout = Instance.new("UIListLayout", tabBar)
-    tabLayout.FillDirection = Enum.FillDirection.Horizontal
+    tabLayout.FillDirection = Enum.FillDirection.Vertical
     tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
     tabLayout.Padding = UDim.new(0, 6)
 
@@ -209,7 +209,7 @@ local function createUI(title)
         sectionLayout.Padding = UDim.new(0, 10)
 
         local tabButton = Instance.new("TextButton", tabBar)
-        tabButton.Size = UDim2.new(0, 100, 1, 0)
+        tabButton.Size = UDim2.new(1, 0, 0, 40)
         tabButton.BackgroundColor3 = Theme.Section
         tabButton.TextColor3 = Theme.Text
         tabButton.Font = Enum.Font.Gotham
