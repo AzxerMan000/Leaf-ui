@@ -1,7 +1,15 @@
-LeafUI = {}
+local LeafUI = {}
 
-local Components = script:WaitForChild("Components") local Theme = require(script:WaitForChild("Theme")) local Util = require(script:WaitForChild("Util"))Load components LeafUI.TitleWindow = require(Components:WaitForChild("TitleWindow")) LeafUI.Button = require(Components:WaitForChild("Button")) LeafUI.Toggle = require(Components:WaitForChild("Toggle")) LeafUI.Slider = require(Components:WaitForChild("Slider")) LeafUI.Dropdown = require(Components:WaitForChild("Dropdown")) LeafUI.Label = require(Components:WaitForChild("Label")) LeafUI.SearchBar = require(Components:WaitForChild("SearchBar")) LeafUI.RestoreToggle = require(Components:WaitForChild("RestoreToggle"))
-
-LeafUI.Theme = Theme LeafUI.Util = Util
+LeafUI.Util = loadstring(game:HttpGet("https://raw.githubusercontent.com/AzxerMan000/Leaf-ui/main/Util.lua"))()
+LeafUI.Theme = loadstring(game:HttpGet("https://raw.githubusercontent.com/AzxerMan000/Leaf-ui/main/Theme.lua"))()
+LeafUI.TitleWindow   = loadstring(game:HttpGet("https://raw.githubusercontent.com/AzxerMan000/Leaf-ui/main/TitleWindow.lua"))()
+LeafUI.Button        = loadstring(game:HttpGet("https://raw.githubusercontent.com/AzxerMan000/Leaf-ui/main/Button.lua"))()
+LeafUI.Toggle        = loadstring(game:HttpGet("https://raw.githubusercontent.com/AzxerMan000/Leaf-ui/main/Toggle.lua"))()
+LeafUI.Slider        = loadstring(game:HttpGet("https://raw.githubusercontent.com/AzxerMan000/Leaf-ui/main/Slider.lua"))()
+LeafUI.Dropdown      = loadstring(game:HttpGet("https://raw.githubusercontent.com/AzxerMan000/Leaf-ui/main/Dropdown.lua"))()
+LeafUI.Label         = loadstring(game:HttpGet("https://raw.githubusercontent.com/AzxerMan000/Leaf-ui/main/Label.lua"))()
+LeafUI.SearchBar     = loadstring(game:HttpGet("https://raw.githubusercontent.com/AzxerMan000/Leaf-ui/main/SearchBar.lua"))()
+LeafUI.RestoreToggle = loadstring(game:HttpGet("https://raw.githubusercontent.com/AzxerMan000/Leaf-ui/main/RestoreToggle.lua"))()
+LeafUI.KeySystem     = loadstring(game:HttpGet("https://raw.githubusercontent.com/AzxerMan000/Leaf-ui/main/Keysystem.lua"))()
 
 return LeafUI
