@@ -1,24 +1,22 @@
--- LeafUI.lua
-local LeafUI = {}
 
+local LeafUI = {}
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-
 local player = Players.LocalPlayer
 
 --==[ Theme ]==--
 local Theme = {
-	PrimaryColor = Color3.fromRGB(40, 120, 200),
-	SecondaryColor = Color3.fromRGB(20, 20, 20),
+	PrimaryColor = Color3.fromRGB(30, 30, 30),
+	AccentColor = Color3.fromRGB(60, 180, 255),
 	TextColor = Color3.fromRGB(255, 255, 255),
-	Font = Enum.Font.Gotham,
+	Font = Enum.Font.Legacy,
 	TextSize = 18,
-	CornerRadius = UDim.new(0, 6),
-	Transparency = 0.3
+	Transparency = 0.3,
+	CornerRadius = UDim.new(0, 6)
 }
 
---==[ GUI Container ]==--
+--==[ GUI Setup ]==--
 local function getGui()
 	local gui = player:WaitForChild("PlayerGui"):FindFirstChild("LeafUI")
 	if not gui then
@@ -31,35 +29,33 @@ local function getGui()
 	return gui
 end
 
---==[ Utility ]==--
-local function roundify(obj)
+--==[ Style Helper ]==--
+local function style(obj)
+	obj.BackgroundTransparency = Theme.Transparency
+	if obj:IsA("TextLabel") or obj:IsA("TextButton") then
+		obj.TextColor3 = Theme.TextColor
+		obj.Font = Theme.Font
+		obj.TextSize = Theme.TextSize
+	end
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = Theme.CornerRadius
 	corner.Parent = obj
 end
 
-local function applyTheme(obj)
-	if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
-		obj.TextColor3 = Theme.TextColor
-		obj.Font = Theme.Font
-		obj.TextSize = Theme.TextSize
-	end
-	obj.BackgroundTransparency = Theme.Transparency
-end
-
-local function applyDefaults(obj, props, defaults)
-	for prop, value in pairs(defaults) do
-		if props[prop] == nil then
-			obj[prop] = value
-		end
-	end
-	for prop, value in pairs(props) do
-		obj[prop] = value
-	end
-end
-
+--==[ Draggable Support (Mobile + PC) ]==--
 local function makeDraggable(frame, dragArea)
-	local dragging, dragStart, startPos
+	local dragging = false
+	local dragStart, startPos
+
+	local function update(input)
+		local delta = input.Position - dragStart
+		frame.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
 
 	dragArea.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -69,119 +65,90 @@ local function makeDraggable(frame, dragArea)
 		end
 	end)
 
-	dragArea.InputChanged:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-			input.Changed:Connect(function()
-				if dragging and input.UserInputState == Enum.UserInputState.End then
-					dragging = false
-				end
-			end)
-		end
-	end)
-
 	UserInputService.InputChanged:Connect(function(input)
-		if dragging then
-			local delta = input.Position - dragStart
-			frame.Position = UDim2.new(
-				startPos.X.Scale,
-				startPos.X.Offset + delta.X,
-				startPos.Y.Scale,
-				startPos.Y.Offset + delta.Y
-			)
+		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+			update(input)
+		end
+	end)
+
+	dragArea.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = false
 		end
 	end)
 end
 
---==[ Core UI ]==--
-function LeafUI.Frame(props)
-	local frame = Instance.new("Frame")
-	applyDefaults(frame, props, {
-		Size = UDim2.new(0, 200, 0, 100),
-		Position = UDim2.new(0.5, -100, 0.5, -50),
-		BackgroundColor3 = Theme.SecondaryColor,
-		Parent = getGui()
-	})
-	frame.BackgroundTransparency = frame.BackgroundTransparency or Theme.Transparency
-	roundify(frame)
-	return frame
-end
+--==[ Core Components ]==--
 
-function LeafUI.Label(props)
+function LeafUI:Label(props)
 	local label = Instance.new("TextLabel")
-	applyDefaults(label, props, {
-		Size = UDim2.new(1, -20, 0, 30),
-		Position = UDim2.new(0, 10, 0, 10),
-		BackgroundTransparency = 1,
-		Parent = getGui()
-	})
-	applyTheme(label)
+	label.Text = props.Text or "Label"
+	label.Size = props.Size or UDim2.new(1, -20, 0, 25)
+	label.Position = props.Position or UDim2.new(0, 10, 0, 10)
+	label.BackgroundTransparency = 1
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.Parent = props.Parent or getGui()
+	style(label)
 	return label
 end
 
-function LeafUI.Button(props, callback)
-	local button = Instance.new("TextButton")
-	applyDefaults(button, props, {
-		Size = UDim2.new(0, 160, 0, 40),
-		Position = UDim2.new(0.5, -80, 0, 60),
-		BackgroundColor3 = Theme.PrimaryColor,
-		Parent = getGui()
-	})
-	applyTheme(button)
-	roundify(button)
-	if callback then
-		button.MouseButton1Click:Connect(callback)
-	end
-	return button
+function LeafUI:Button(props, callback)
+	local btn = Instance.new("TextButton")
+	btn.Text = props.Text or "Button"
+	btn.Size = props.Size or UDim2.new(0, 120, 0, 30)
+	btn.Position = props.Position or UDim2.new(0.5, -60, 0, 50)
+	btn.BackgroundColor3 = props.BackgroundColor3 or Theme.AccentColor
+	btn.Parent = props.Parent or getGui()
+	style(btn)
+	if callback then btn.MouseButton1Click:Connect(callback) end
+	return btn
 end
 
---==[ TitleBar Window Component ]==--
-function LeafUI.TitleWindow(titleText)
+function LeafUI:TitleWindow(titleText)
 	local gui = getGui()
 
-	local window = LeafUI.Frame({
-		Size = UDim2.new(0, 300, 0, 200),
-		Position = UDim2.new(0.5, -150, 0.5, -100),
-		BackgroundColor3 = Theme.SecondaryColor,
-		Parent = gui
-	})
+	local frame = Instance.new("Frame")
+	frame.Size = UDim2.new(0, 300, 0, 200)
+	frame.Position = UDim2.new(0.5, -150, 0.5, -100)
+	frame.BackgroundColor3 = Theme.PrimaryColor
+	frame.Parent = gui
+	style(frame)
 
-	local titleBar = LeafUI.Frame({
-		Size = UDim2.new(1, 0, 0, 30),
-		BackgroundColor3 = Theme.PrimaryColor,
-		Parent = window
-	})
+	local titleBar = Instance.new("Frame")
+	titleBar.Size = UDim2.new(1, 0, 0, 30)
+	titleBar.BackgroundColor3 = Theme.AccentColor
+	titleBar.Parent = frame
+	style(titleBar)
 
-	local title = LeafUI.Label({
+	local title = self:Label({
 		Text = titleText or "Leaf UI",
-		TextXAlignment = Enum.TextXAlignment.Left,
-		Size = UDim2.new(1, -50, 1, 0),
-		Position = UDim2.new(0, 10, 0, 0),
-		Parent = titleBar
+		Parent = titleBar,
+		Size = UDim2.new(1, -40, 1, 0),
+		Position = UDim2.new(0, 10, 0, 0)
 	})
 
-	local minimized = false
-	local content = LeafUI.Frame({
-		Size = UDim2.new(1, 0, 1, -30),
-		Position = UDim2.new(0, 0, 0, 30),
-		BackgroundColor3 = Theme.SecondaryColor,
-		Parent = window
-	})
+	local content = Instance.new("Frame")
+	content.Size = UDim2.new(1, 0, 1, -30)
+	content.Position = UDim2.new(0, 0, 0, 30)
+	content.BackgroundColor3 = Theme.PrimaryColor
+	content.Parent = frame
+	style(content)
 
-	local toggleBtn = LeafUI.Button({
+	local minimize = self:Button({
 		Text = "-",
 		Size = UDim2.new(0, 30, 1, 0),
 		Position = UDim2.new(1, -35, 0, 0),
 		BackgroundColor3 = Color3.fromRGB(80, 80, 80),
 		Parent = titleBar
 	}, function()
-		minimized = not minimized
-		local goalSize = minimized and UDim2.new(1, 0, 0, 0) or UDim2.new(1, 0, 1, -30)
-		TweenService:Create(content, TweenInfo.new(0.3), { Size = goalSize }):Play()
+		local minimized = content.Size.Y.Offset == 0
+		local targetSize = minimized and UDim2.new(1, 0, 1, -30) or UDim2.new(1, 0, 0, 0)
+		TweenService:Create(content, TweenInfo.new(0.3), { Size = targetSize }):Play()
 	end)
 
-	makeDraggable(window, titleBar)
+	makeDraggable(frame, titleBar)
 
-	return window, content
+	return frame, content
 end
 
 return LeafUI
