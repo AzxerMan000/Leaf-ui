@@ -1,5 +1,5 @@
-local Theme = require(script.Parent.Parent.Theme) local Util = require(script.Parent.Parent.Util)
-
+local Theme = loadstring(game:HttpGet("https://raw.githubusercontent.com/AzxerMan000/Leaf-ui/main/Theme.lua"))()
+local Util = loadstring(game:HttpGet("https://raw.githubusercontent.com/AzxerMan000/Leaf-ui/main/Util.lua"))()
 return function(props) local toggleBtn = Instance.new("TextButton") toggleBtn.Size = UDim2.new(0, 120, 0, 28) toggleBtn.Position = UDim2.new(0, 10, 0, 10) toggleBtn.BackgroundColor3 = Color3.new(0, 0, 0) toggleBtn.Text = "Restore UI" toggleBtn.TextColor3 = Color3.new(1, 1, 1) toggleBtn.Font = Theme.Font toggleBtn.TextSize = Theme.TextSize toggleBtn.Visible = false Util:Roundify(toggleBtn) toggleBtn.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 
 local target = props.Target
