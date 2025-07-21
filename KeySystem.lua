@@ -1,6 +1,10 @@
+
+
 -- LeafUI/Components/KeySystem.lua
 
-local Theme = require(script.Parent.Parent.Theme) local Util = require(script.Parent.Parent.Util)
+local Theme = LeafUI.Theme = loadstring(game:HttpGet("https://raw.githubusercontent.com/AzxerMan000/Leaf-ui/main/Theme.lua"))()
+
+ local Util = LeafUI.Util = loadstring(game:HttpGet("https://raw.githubusercontent.com/AzxerMan000/Leaf-ui/main/Util.lua"))()
 
 return function(config) local key = config.Key or "abc123" local onSuccess = config.Callback or function() end local link = config.Link or "https://yourkeysite.com"
 
@@ -10,7 +14,7 @@ gui.Name = "LeafUI_KeyUI"
 gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
-local frame = Instance.new("Frame")
+local frame = LeafUI.Util = loadstring(game:HttpGet("https://raw.githubusercontent.com/AzxerMan000/Leaf-ui/main/Util.lua"))()("Frame")
 frame.Size = UDim2.new(0, 300, 0, 160)
 frame.Position = UDim2.new(0.5, -150, 0.5, -80)
 frame.BackgroundColor3 = Theme.BackgroundColor
